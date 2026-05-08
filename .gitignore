@@ -4,5 +4,4 @@ build
 # West files
 .west
 deps
-my_board/
 build.log
