@@ -1,6 +1,7 @@
 /dts-v1/;
 
 #include <espressif/esp32c6/esp32c6_wroom_n8.dtsi>
+#include "../our_board/esp32c6_devkitc_hpcore-pinctrl.dtsi"
 #include <espressif/partitions_0x0_default.dtsi>
 
 / {
@@ -17,6 +18,8 @@
         zephyr,sram = &sramhp;
 		zephyr,flash = &flash0;
 		zephyr,code-partition = &slot0_partition;
+        zephyr,console = &uart0;
+        zephyr,shell-uart = &uart0;
     };
 
     leds {
@@ -36,4 +39,12 @@
 
 &gpio0 {
 	status = "okay";
+};
+
+&uart0 {
+    status = "okay";
+    current-speed = <115200>;
+    pinctrl-0 = <&uart0_default>;
+    pinctrl-1 = <&uart0_sleep>;
+    pinctrl-names = "default", "sleep";
 };

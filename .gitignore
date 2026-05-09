@@ -1,7 +1,11 @@
 # Build
-build
-
-# West files
-.west
-deps
+build/
 build.log
+.cache/
+
+# West/dependencies
+.west/
+.vscode/
+deps/
+dts/
+.clang-format
