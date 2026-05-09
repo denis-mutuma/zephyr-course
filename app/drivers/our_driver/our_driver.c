@@ -3,6 +3,8 @@
 #include <zephyr/drivers/sensor.h>
 #include <zephyr/logging/log.h>
 
+#include "our_driver.h" 
+
 #define DT_DRV_COMPAT our_driver
 
 LOG_MODULE_REGISTER(our_driver, LOG_LEVEL_INF);
@@ -10,7 +12,15 @@ LOG_MODULE_REGISTER(our_driver, LOG_LEVEL_INF);
 struct our_driver_data {
     int32_t sample_celsius;
     uint32_t fetch_count;
+    int32_t temperature_offset_celsius;
 };
+
+static int set_temperature_offset_impl(const struct device *dev, int32_t offset_celsius) {
+    struct our_driver_data *data = dev->data;
+    data->temperature_offset_celsius = offset_celsius;
+    LOG_INF("Temperature offset set to %d C", offset_celsius);
+    return 0;
+}
 
 static int sample_fetch_my_impl(const struct device *dev, enum sensor_channel chan) {
     struct our_driver_data *data = dev->data;
@@ -20,7 +30,7 @@ static int sample_fetch_my_impl(const struct device *dev, enum sensor_channel ch
     }
 
     data->fetch_count++;
-    data->sample_celsius = 20 + data->fetch_count;
+    data->sample_celsius = 20 + data->fetch_count + data->temperature_offset_celsius; // Simulate a changing temperature
 
     LOG_INF("Fetched sample: %d C", data->sample_celsius);
     return 0;
@@ -41,9 +51,12 @@ static int channel_get_my_impl(const struct device *dev, enum sensor_channel cha
     return 0;
 }
 
-static DEVICE_API(sensor, api_denis) = {
-    .sample_fetch = sample_fetch_my_impl,
-    .channel_get = channel_get_my_impl,
+static const struct our_driver_api api_denis = {
+    .sensor_api = {
+        .sample_fetch = sample_fetch_my_impl,
+        .channel_get = channel_get_my_impl,
+    },
+    .set_temperature_offset = set_temperature_offset_impl,
 };
 
 

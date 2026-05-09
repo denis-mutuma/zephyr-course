@@ -4,6 +4,8 @@
 #include <zephyr/kernel.h>
 #include <zephyr/logging/log.h>
 
+#include "our_driver.h"
+
 /* The devicetree node identifier for the "led0" alias. */
 #define HEARTBEAT_LED DT_ALIAS(app_led)
 
@@ -21,7 +23,10 @@ namespace {
             return;
         }
 
-        auto ret = sensor_sample_fetch(driver);
+        auto ret = our_driver_set_temperature_offset(driver, 10);
+        LOG_INF("Set offset ret %d", ret);
+        
+        ret = sensor_sample_fetch(driver);
         LOG_INF("Fetch ret %d", ret);
         
         ret = sensor_channel_get(driver, SENSOR_CHAN_AMBIENT_TEMP, &val);
